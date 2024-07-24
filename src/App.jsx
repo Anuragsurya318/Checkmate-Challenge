@@ -1,17 +1,12 @@
-import { useState } from "react";
-import "./App.css";
-import Board from "./components/Board/Board";
+import React from "react";
+import ChessBoard from "./components/ChessBoard/ChessBoard";
 
-function App() {
-  const [count, setCount] = useState(0);
-
+const App = () => {
   return (
-    <>
-      <div className="font-sofia w-full h-full">
-        <Board />
-      </div>
-    </>
+    <div className="w-screen h-screen flex items-center justify-center bg-bg_color">
+      <ChessBoard />
+    </div>
   );
-}
+};
 
 export default App;

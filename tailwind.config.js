@@ -10,9 +10,11 @@ export default {
       },
       width: {
         "tile-size": "100px",
+        600: "600px",
       },
       height: {
         "tile-size": "100px",
+        600: "600px",
       },
       fontFamily: {
         sofia: ['"Sofia Sans"', "sans-serif"],
