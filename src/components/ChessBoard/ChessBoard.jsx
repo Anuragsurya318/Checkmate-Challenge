@@ -160,11 +160,15 @@ export default function ChessBoard() {
       setPieces((value) => {
         const updatedPieces = value.map((p) => {
           if (p.x === gridX && p.y === gridY) {
-            const validMove = referee.isValidMove(gridX, gridY, x, y, p.type, p.team);
+            const validMove = referee.isValidMove(gridX, gridY, x, y, p.type, p.team, value);
 
             if (validMove) {
               p.x = x;
               p.y = y;
+            } else {
+              activePiece.style.position = "relative";
+              activePiece.style.removeProperty("top");
+              activePiece.style.removeProperty("left");
             }
           }
           return p;

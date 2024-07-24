@@ -15,7 +15,7 @@ const Tile = ({ isWhite, image }) => {
       {image && (
         <div
           style={{ backgroundImage: `url(${image})` }}
-          className={`chess-piece w-full h-full bg-cover ${
+          className={`chess-piece w-full h-full bg-cover  ${
             isGrabbing ? "cursor-grabbing" : "cursor-grab"
           }`}
         ></div>

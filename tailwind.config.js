@@ -19,6 +19,15 @@ export default {
       fontFamily: {
         sofia: ['"Sofia Sans"', "sans-serif"],
       },
+      transitionProperty: {
+        "left-top": "left, top",
+      },
+      transitionDuration: {
+        300: "300ms",
+      },
+      transitionTimingFunction: {
+        ease: "ease",
+      },
       // for max-width: 450 title-size is 50px
     },
   },
