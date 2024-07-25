@@ -9,7 +9,6 @@ import {
   TeamType,
   initialBoardState,
 } from "../../Constants";
-
 import { wb, wn, wq, wr, bb, bn, bq, br } from "../../assets/index.js";
 
 export default function ChessBoard() {
@@ -17,6 +16,7 @@ export default function ChessBoard() {
   const [grabPosition, setGrabPosition] = useState({ x: -1, y: -1 });
   const [promotionPawn, setPromotionPawn] = useState(null);
   const [pieces, setPieces] = useState(initialBoardState);
+  const [highlightedPositions, setHighlightedPositions] = useState([]);
   const chessboardRef = useRef(null);
   const modalRef = useRef(null);
   const referee = new Referee();
@@ -43,6 +43,17 @@ export default function ChessBoard() {
       element.classList.add("grabbed");
 
       setActivePiece(element);
+      updateValidMoves(grabX, grabY);
+    }
+  }
+
+  function updateValidMoves(x, y) {
+    const piece = pieces.find((p) => p.x === x && p.y === y);
+    if (piece) {
+      const validMoves = referee.getValidMoves(piece, pieces);
+      setHighlightedPositions(validMoves);
+    } else {
+      setHighlightedPositions([]);
     }
   }
 
@@ -140,6 +151,7 @@ export default function ChessBoard() {
           }, []);
 
           setPieces(updatedPieces);
+          setHighlightedPositions([]);
         } else {
           activePiece.style.position = "relative";
           activePiece.style.removeProperty("top");
@@ -190,8 +202,10 @@ export default function ChessBoard() {
         }
       });
 
+      const highlight = highlightedPositions.some((p) => p.x === i && p.y === j);
+
       const isWhite = number % 2 === 0;
-      board.push(<Tile key={`${j},${i}`} image={image} isWhite={isWhite} />);
+      board.push(<Tile key={`${j},${i}`} image={image} isWhite={isWhite} highlight={highlight} />);
     }
   }
 

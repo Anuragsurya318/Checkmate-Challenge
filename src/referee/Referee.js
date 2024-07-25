@@ -1,4 +1,17 @@
-import { bishopMove, kingMove, knightMove, pawnMove, queenMove, rookMove } from "./rules";
+import {
+  bishopMove,
+  getPossibleBishopMoves,
+  getPossibleKingMoves,
+  getPossibleKnightMoves,
+  getPossiblePawnMoves,
+  getPossibleQueenMoves,
+  getPossibleRookMoves,
+  kingMove,
+  knightMove,
+  pawnMove,
+  queenMove,
+  rookMove,
+} from "./rules";
 
 export default class Referee {
   isEnPassantMove(px, py, x, y, type, team, boardState) {
@@ -39,4 +52,43 @@ export default class Referee {
     }
     return validMove;
   }
+
+  getValidMoves(piece, boardState) {
+    switch (piece.type) {
+      case "PAWN":
+        return getPossiblePawnMoves(piece, boardState);
+      case "KNIGHT":
+        return getPossibleKnightMoves(piece, boardState);
+      case "BISHOP":
+        return getPossibleBishopMoves(piece, boardState);
+      case "ROOK":
+        return getPossibleRookMoves(piece, boardState);
+      case "QUEEN":
+        return getPossibleQueenMoves(piece, boardState);
+      case "KING":
+        return getPossibleKingMoves(piece, boardState);
+      default:
+        return [];
+    }
+  }
 }
+
+// getValidMoves(piece: Piece, boardState: Piece[]) : Position[] {
+//   switch(piece.type)
+//   {
+//     case PieceType.PAWN:
+//       return getPossiblePawnMoves(piece, boardState);
+//     case PieceType.KNIGHT:
+//       return getPossibleKnightMoves(piece, boardState);
+//     case PieceType.BISHOP:
+//       return getPossibleBishopMoves(piece, boardState);
+//     case PieceType.ROOK:
+//       return getPossibleRookMoves(piece, boardState);
+//     case PieceType.QUEEN:
+//       return getPossibleQueenMoves(piece, boardState);
+//     case PieceType.KING:
+//       return getPossibleKingMoves(piece, boardState);
+//     default:
+//       return [];
+//   }
+// }

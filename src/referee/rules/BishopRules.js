@@ -1,4 +1,8 @@
-import { tileIsEmptyOrOccupiedByOpponent, tileIsOccupied } from "./GeneralRules";
+import {
+  tileIsEmptyOrOccupiedByOpponent,
+  tileIsOccupied,
+  tileIsOccupiedByOpponent,
+} from "./GeneralRules";
 
 export const bishopMove = (px, py, x, y, team, boardState) => {
   for (let i = 1; i < 8; i++) {
@@ -73,4 +77,66 @@ export const bishopMove = (px, py, x, y, team, boardState) => {
     }
   }
   return false;
+};
+
+export const getPossibleBishopMoves = (bishop, boardState) => {
+  const possibleMoves = [];
+
+  // Upper right movement
+  for (let i = 1; i < 8; i++) {
+    const destination = { x: bishop.x + i, y: bishop.y + i };
+
+    if (!tileIsOccupied(destination.x, destination.y, boardState)) {
+      possibleMoves.push(destination);
+    } else if (tileIsOccupiedByOpponent(destination.x, destination.y, boardState, bishop.team)) {
+      possibleMoves.push(destination);
+      break;
+    } else {
+      break;
+    }
+  }
+
+  // Bottom right movement
+  for (let i = 1; i < 8; i++) {
+    const destination = { x: bishop.x + i, y: bishop.y - i };
+
+    if (!tileIsOccupied(destination.x, destination.y, boardState)) {
+      possibleMoves.push(destination);
+    } else if (tileIsOccupiedByOpponent(destination.x, destination.y, boardState, bishop.team)) {
+      possibleMoves.push(destination);
+      break;
+    } else {
+      break;
+    }
+  }
+
+  // Bottom left movement
+  for (let i = 1; i < 8; i++) {
+    const destination = { x: bishop.x - i, y: bishop.y - i };
+
+    if (!tileIsOccupied(destination.x, destination.y, boardState)) {
+      possibleMoves.push(destination);
+    } else if (tileIsOccupiedByOpponent(destination.x, destination.y, boardState, bishop.team)) {
+      possibleMoves.push(destination);
+      break;
+    } else {
+      break;
+    }
+  }
+
+  // Top left movement
+  for (let i = 1; i < 8; i++) {
+    const destination = { x: bishop.x - i, y: bishop.y + i };
+
+    if (!tileIsOccupied(destination.x, destination.y, boardState)) {
+      possibleMoves.push(destination);
+    } else if (tileIsOccupiedByOpponent(destination.x, destination.y, boardState, bishop.team)) {
+      possibleMoves.push(destination);
+      break;
+    } else {
+      break;
+    }
+  }
+
+  return possibleMoves;
 };

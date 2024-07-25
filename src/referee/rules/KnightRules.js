@@ -23,3 +23,25 @@ export const knightMove = (px, py, x, y, team, boardState) => {
   }
   return false;
 };
+
+export const getPossibleKnightMoves = (knight, boardState) => {
+  const possibleMoves = [];
+
+  for (let i = -1; i < 2; i += 2) {
+    for (let j = -1; j < 2; j += 2) {
+      const verticalMove = { x: knight.x + j, y: knight.y + i * 2 };
+      const horizontalMove = { x: knight.x + i * 2, y: knight.y + j };
+      if (
+        tileIsEmptyOrOccupiedByOpponent(verticalMove.x, verticalMove.y, boardState, knight.team)
+      ) {
+        possibleMoves.push(verticalMove);
+      }
+      if (
+        tileIsEmptyOrOccupiedByOpponent(horizontalMove.x, horizontalMove.y, boardState, knight.team)
+      ) {
+        possibleMoves.push(horizontalMove);
+      }
+    }
+  }
+  return possibleMoves;
+};
