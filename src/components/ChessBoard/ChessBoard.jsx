@@ -62,7 +62,6 @@ export default function ChessBoard() {
   // he called x and y as position.x and position.y respectively...
   // he called piece.x and piece.y as piece.position.x and piece.position.y respectively...
   // he called p.x and p.y as p.position.x and p.position.y respectively...
-
   function dropPiece(e) {
     const chessboard = chessboardRef.current;
     if (activePiece && chessboard) {
@@ -168,7 +167,7 @@ export default function ChessBoard() {
       onMouseUp={(e) => dropPiece(e)}
       id="chessboard"
       ref={chessboardRef}
-      className="w-[550px] h-[550px] flex flex-wrap relative"
+      className="w-[550px] h-[550px] flex flex-wrap relative "
     >
       {board}
     </div>
