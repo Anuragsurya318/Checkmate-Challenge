@@ -1,4 +1,11 @@
 export default class Referee {
+  tileIsEmptyOrOccupiedByOpponent(x, y, boardState, team) {
+    return (
+      !this.tileIsOccupied(x, y, boardState) ||
+      this.TileIsOccupiedByOpponent(x, y, boardState, team)
+    );
+  }
+
   tileIsOccupied(x, y, boardState) {
     const piece = boardState.find((p) => p.x === x && p.y === y);
 
@@ -63,6 +70,28 @@ export default class Referee {
         console.log("upper / bottom right");
         if (this.TileIsOccupiedByOpponent(x, y, boardState, team)) {
           return true;
+        }
+      }
+    } else if (type === "KNIGHT") {
+      for (let i = -1; i < 2; i += 2) {
+        for (let j = -1; j < 2; j += 2) {
+          // TOP AND BOTTOM SIDE MOVEMENT
+          if (y - py === 2 * i) {
+            if (x - px === j) {
+              if (this.tileIsEmptyOrOccupiedByOpponent(x, y, boardState, team)) {
+                return true;
+              }
+            }
+          }
+
+          // RIGHT AND LEFT SIDE MOVEMENT
+          if (x - px === 2 * i) {
+            if (y - py === j) {
+              if (this.tileIsEmptyOrOccupiedByOpponent(x, y, boardState, team)) {
+                return true;
+              }
+            }
+          }
         }
       }
     }

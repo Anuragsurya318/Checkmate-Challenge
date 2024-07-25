@@ -1,113 +1,20 @@
 import { useRef, useState } from "react";
 import Tile from "../Tile/Tile";
 import Referee from "../../referee/Referee";
-
-const verticalAxis = ["1", "2", "3", "4", "5", "6", "7", "8"];
-const horizontalAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
-
-const PieceType = {
-  PAWN: "PAWN",
-  BISHOP: "BISHOP",
-  KNIGHT: "KNIGHT",
-  ROOK: "ROOK",
-  QUEEN: "QUEEN",
-  KING: "KING",
-};
-
-const TeamType = {
-  OPPONENT: "OPPONENT",
-  OUR: "OUR",
-};
-
-const initialBoardState = [];
-
-for (let p = 0; p < 2; p++) {
-  const teamType = p === 0 ? TeamType.OPPONENT : TeamType.OUR;
-  const type = teamType === TeamType.OPPONENT ? "b" : "w";
-  const y = teamType === TeamType.OPPONENT ? 7 : 0;
-
-  initialBoardState.push({
-    image: `../../src/assets/${type}r.png`,
-    x: 0,
-    y,
-    type: PieceType.ROOK,
-    team: teamType,
-  });
-  initialBoardState.push({
-    image: `../../src/assets/${type}r.png`,
-    x: 7,
-    y,
-    type: PieceType.ROOK,
-    team: teamType,
-  });
-  initialBoardState.push({
-    image: `../../src/assets/${type}n.png`,
-    x: 1,
-    y,
-    type: PieceType.KNIGHT,
-    team: teamType,
-  });
-  initialBoardState.push({
-    image: `../../src/assets/${type}n.png`,
-    x: 6,
-    y,
-    type: PieceType.KNIGHT,
-    team: teamType,
-  });
-  initialBoardState.push({
-    image: `../../src/assets/${type}b.png`,
-    x: 2,
-    y,
-    type: PieceType.BISHOP,
-    team: teamType,
-  });
-  initialBoardState.push({
-    image: `../../src/assets/${type}b.png`,
-    x: 5,
-    y,
-    type: PieceType.BISHOP,
-    team: teamType,
-  });
-  initialBoardState.push({
-    image: `../../src/assets/${type}q.png`,
-    x: 3,
-    y,
-    type: PieceType.QUEEN,
-    team: teamType,
-  });
-  initialBoardState.push({
-    image: `../../src/assets/${type}k.png`,
-    x: 4,
-    y,
-    type: PieceType.KING,
-    team: teamType,
-  });
-}
-
-for (let i = 0; i < 8; i++) {
-  initialBoardState.push({
-    image: `../../src/assets/bp.png`,
-    x: i,
-    y: 6,
-    type: PieceType.PAWN,
-    team: TeamType.OPPONENT,
-  });
-}
-
-for (let i = 0; i < 8; i++) {
-  initialBoardState.push({
-    image: `../../src/assets/wp.png`,
-    x: i,
-    y: 1,
-    type: PieceType.PAWN,
-    team: TeamType.OUR,
-  });
-}
+import {
+  VERTICAL_AXIS,
+  HORIZONTAL_AXIS,
+  GRID_SIZE,
+  PieceType,
+  TeamType,
+  initialBoardState,
+} from "../../Constants";
 
 export default function ChessBoard() {
   const [activePiece, setActivePiece] = useState(null);
-  const [gridX, setGridX] = useState(0);
-  const [gridY, setGridY] = useState(0);
+  const [grabPosition, setGrabPosition] = useState({ x: -1, y: -1 });
+  // const [grabPosition.x, setgrabPosition.x] = useState(0);
+  // const [grabPosition.y, setgrabPosition.y] = useState(0);
   const [pieces, setPieces] = useState(initialBoardState);
   const chessboardRef = useRef(null);
   const referee = new Referee();
@@ -116,8 +23,9 @@ export default function ChessBoard() {
     const element = e.target;
     const chessboard = chessboardRef.current;
     if (element.classList.contains("chess-piece") && chessboard) {
-      setGridX(Math.floor((e.clientX - chessboard.offsetLeft) / 68.75));
-      setGridY(Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 550) / 68.75)));
+      const grabX = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
+      const grabY = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 550) / GRID_SIZE));
+      setGrabPosition({ x: grabX, y: grabY });
 
       element.style.width = "68.75px";
       element.style.height = "68.75px";
@@ -151,19 +59,22 @@ export default function ChessBoard() {
     }
   }
 
+  // he called x and y as position.x and position.y respectively...
+  // he called piece.x and piece.y as piece.position.x and piece.position.y respectively...
+  // he called p.x and p.y as p.position.x and p.position.y respectively...
+
   function dropPiece(e) {
     const chessboard = chessboardRef.current;
     if (activePiece && chessboard) {
-      const x = Math.floor((e.clientX - chessboard.offsetLeft) / 68.75);
-      const y = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 550) / 68.75));
+      const x = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
+      const y = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 550) / GRID_SIZE));
 
-      const currentPiece = pieces.find((p) => p.x === gridX && p.y === gridY);
-      const attackedPiece = pieces.find((p) => p.x === x && p.y === y);
+      const currentPiece = pieces.find((p) => p.x === grabPosition.x && p.y === grabPosition.y);
 
       if (currentPiece) {
         const validMove = referee.isValidMove(
-          gridX,
-          gridY,
+          grabPosition.x,
+          grabPosition.y,
           x,
           y,
           currentPiece.type,
@@ -172,8 +83,8 @@ export default function ChessBoard() {
         );
 
         const isEnPassant = referee.isEnPassantMove(
-          gridX,
-          gridY,
+          grabPosition.x,
+          grabPosition.y,
           x,
           y,
           currentPiece.type,
@@ -185,7 +96,7 @@ export default function ChessBoard() {
 
         if (isEnPassant) {
           const updatedPieces = pieces.reduce((results, piece) => {
-            if (piece.x === gridX && piece.y === gridY) {
+            if (piece.x === grabPosition.x && piece.y === grabPosition.y) {
               piece.enPassant = false;
               piece.x = x;
               piece.y = y;
@@ -202,8 +113,8 @@ export default function ChessBoard() {
           setPieces(updatedPieces);
         } else if (validMove) {
           const updatedPieces = pieces.reduce((results, piece) => {
-            if (piece.x === gridX && piece.y === gridY) {
-              if (Math.abs(gridY - y) === 2 && piece.type === PieceType.PAWN) {
+            if (piece.x === grabPosition.x && piece.y === grabPosition.y) {
+              if (Math.abs(grabPosition.y - y) === 2 && piece.type === PieceType.PAWN) {
                 piece.enPassant = true;
               } else {
                 piece.enPassant = false;
@@ -234,8 +145,8 @@ export default function ChessBoard() {
 
   const board = [];
 
-  for (let j = verticalAxis.length - 1; j >= 0; j--) {
-    for (let i = 0; i < horizontalAxis.length; i++) {
+  for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
+    for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
       const number = j + i + 2;
       let image = undefined;
 
