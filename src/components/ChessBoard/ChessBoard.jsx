@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Tile from "../Tile/Tile";
 import Referee from "../../referee/Referee";
 import {
@@ -10,14 +10,24 @@ import {
   initialBoardState,
 } from "../../Constants";
 
+import { wb, wn, wq, wr, bb, bn, bq, br } from "../../assets/index.js";
+
 export default function ChessBoard() {
   const [activePiece, setActivePiece] = useState(null);
   const [grabPosition, setGrabPosition] = useState({ x: -1, y: -1 });
-  // const [grabPosition.x, setgrabPosition.x] = useState(0);
-  // const [grabPosition.y, setgrabPosition.y] = useState(0);
+  const [promotionPawn, setPromotionPawn] = useState(null);
   const [pieces, setPieces] = useState(initialBoardState);
   const chessboardRef = useRef(null);
+  const modalRef = useRef(null);
   const referee = new Referee();
+
+  useEffect(() => {
+    if (promotionPawn) {
+      modalRef.current.style.display = "flex";
+    } else {
+      modalRef.current.style.display = "none";
+    }
+  }, [promotionPawn]);
 
   function grabPiece(e) {
     const element = e.target;
@@ -39,29 +49,22 @@ export default function ChessBoard() {
   function movePiece(e) {
     const chessboard = chessboardRef.current;
     if (activePiece && chessboard) {
-      // Get the bounding rectangle of the chessboard
       const chessboardRect = chessboard.getBoundingClientRect();
       const pieceSize = 68.75;
 
-      // Calculate the new position of the piece
       const x = e.clientX - pieceSize / 2;
       const y = e.clientY - pieceSize / 2;
 
-      // Constrain the position within the boundaries of the chessboard
       const minX = chessboardRect.left;
       const minY = chessboardRect.top;
       const maxX = chessboardRect.right - pieceSize;
       const maxY = chessboardRect.bottom - pieceSize;
 
-      // Set the new position, ensuring the piece stays within the chessboard
       activePiece.style.left = `${Math.max(minX, Math.min(x, maxX)) - chessboardRect.left}px`;
       activePiece.style.top = `${Math.max(minY, Math.min(y, maxY)) - chessboardRect.top}px`;
     }
   }
 
-  // he called x and y as position.x and position.y respectively...
-  // he called piece.x and piece.y as piece.position.x and piece.position.y respectively...
-  // he called p.x and p.y as p.position.x and p.position.y respectively...
   function dropPiece(e) {
     const chessboard = chessboardRef.current;
     if (activePiece && chessboard) {
@@ -120,6 +123,12 @@ export default function ChessBoard() {
               }
               piece.x = x;
               piece.y = y;
+
+              let promotionRow = piece.team === TeamType.OUR ? 7 : 0;
+
+              if (piece.type === PieceType.PAWN && y === promotionRow) {
+                setPromotionPawn(piece);
+              }
               results.push(piece);
             } else if (!(piece.x === x && piece.y === y)) {
               if (piece.type === PieceType.PAWN) {
@@ -142,6 +151,32 @@ export default function ChessBoard() {
     }
   }
 
+  function promotePawn(pieceType) {
+    if (promotionPawn === null) return;
+    const updatedPieces = pieces.reduce((results, piece) => {
+      if (piece.x === promotionPawn.x && piece.y === promotionPawn.y) {
+        piece.type = pieceType;
+
+        if (pieceType === PieceType.ROOK) {
+          piece.image = piece.team === TeamType.OUR ? wr : br;
+        } else if (pieceType === PieceType.BISHOP) {
+          piece.image = piece.team === TeamType.OUR ? wb : bb;
+        } else if (pieceType === PieceType.KNIGHT) {
+          piece.image = piece.team === TeamType.OUR ? wn : bn;
+        } else if (pieceType === PieceType.QUEEN) {
+          piece.image = piece.team === TeamType.OUR ? wq : bq;
+        }
+      }
+      results.push(piece);
+      return results;
+    }, []);
+
+    setPieces(updatedPieces);
+    setPromotionPawn(null);
+
+    modalRef.current.classList.add("hidden");
+  }
+
   const board = [];
 
   for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
@@ -161,15 +196,80 @@ export default function ChessBoard() {
   }
 
   return (
-    <div
-      onMouseMove={(e) => movePiece(e)}
-      onMouseDown={(e) => grabPiece(e)}
-      onMouseUp={(e) => dropPiece(e)}
-      id="chessboard"
-      ref={chessboardRef}
-      className="w-[550px] h-[550px] flex flex-wrap relative "
-    >
-      {board}
-    </div>
+    <>
+      <div
+        id="pawn-promotion-modal"
+        ref={modalRef}
+        className="absolute top-0 bottom-0 left-0 right-0 z-50 flex items-center justify-center select-none hidden"
+      >
+        <div className="modal-body w-[550px] h-[225px] z-50 top-48 absolute bg-[rgba(0,0,0,0.4)] flex justify-center items-center">
+          {promotionPawn?.team === TeamType.OUR ? (
+            <>
+              <img
+                src={wr}
+                onClick={() => promotePawn(PieceType.ROOK)}
+                alt="White Rook"
+                className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+              />
+              <img
+                src={wb}
+                onClick={() => promotePawn(PieceType.BISHOP)}
+                alt="White Bishop"
+                className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+              />
+              <img
+                src={wn}
+                onClick={() => promotePawn(PieceType.KNIGHT)}
+                alt="White Knight"
+                className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+              />
+              <img
+                src={wq}
+                onClick={() => promotePawn(PieceType.QUEEN)}
+                alt="White Queen"
+                className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+              />
+            </>
+          ) : (
+            <>
+              <img
+                src={br}
+                onClick={() => promotePawn(PieceType.ROOK)}
+                alt="Black Rook"
+                className="h-36 hover:bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer"
+              />
+              <img
+                src={bb}
+                onClick={() => promotePawn(PieceType.BISHOP)}
+                alt="Black Bishop"
+                className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+              />
+              <img
+                src={bn}
+                onClick={() => promotePawn(PieceType.KNIGHT)}
+                alt="Black Knight"
+                className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+              />
+              <img
+                src={bq}
+                onClick={() => promotePawn(PieceType.QUEEN)}
+                alt="Black Queen"
+                className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+              />
+            </>
+          )}
+        </div>
+      </div>
+      <div
+        onMouseMove={(e) => movePiece(e)}
+        onMouseDown={(e) => grabPiece(e)}
+        onMouseUp={(e) => dropPiece(e)}
+        id="chessboard"
+        ref={chessboardRef}
+        className="w-[550px] h-[550px] flex flex-wrap relative"
+      >
+        {board}
+      </div>
+    </>
   );
 }

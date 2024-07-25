@@ -2,7 +2,6 @@ import { tileIsEmptyOrOccupiedByOpponent, tileIsOccupied } from "./GeneralRules"
 
 export const rookMove = (px, py, x, y, team, boardState) => {
   if (px === x) {
-    console.log("Moving vertically!");
     for (let i = 1; i < 8; i++) {
       let multiplier = y < py ? -1 : 1;
       let passedY = py + i * multiplier;
@@ -18,7 +17,6 @@ export const rookMove = (px, py, x, y, team, boardState) => {
     }
   }
   if (py === y) {
-    console.log("Moving horizontally!");
     for (let i = 1; i < 8; i++) {
       let multiplier = x < px ? -1 : 1;
       let passedX = px + i * multiplier;
