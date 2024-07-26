@@ -48,47 +48,83 @@ export default class Referee {
         break;
       case "KING":
         validMove = kingMove(px, py, x, y, team, boardState);
+        if (validMove && Math.abs(px - x) === 2) {
+          this.handleCastling(px, py, x, y, team, boardState);
+        }
         break;
     }
-    return validMove;
+
+    if (!validMove) return false;
+
+    const hypotheticalBoard = boardState.map((p) =>
+      p.x === px && p.y === py ? { ...p, x, y } : p
+    );
+
+    return !this.isKingInDanger(team, hypotheticalBoard);
   }
 
-  getValidMoves(piece, boardState) {
-    switch (piece.type) {
-      case "PAWN":
-        return getPossiblePawnMoves(piece, boardState);
-      case "KNIGHT":
-        return getPossibleKnightMoves(piece, boardState);
-      case "BISHOP":
-        return getPossibleBishopMoves(piece, boardState);
-      case "ROOK":
-        return getPossibleRookMoves(piece, boardState);
-      case "QUEEN":
-        return getPossibleQueenMoves(piece, boardState);
-      case "KING":
-        return getPossibleKingMoves(piece, boardState);
-      default:
-        return [];
+  handleCastling(px, py, x, y, team, boardState) {
+    const rookX = x > px ? 7 : 0; // Rook position depending on king side or queen side castling
+    const rookNewX = x > px ? x - 1 : x + 1;
+    const rook = boardState.find(
+      (p) => p.x === rookX && p.y === py && p.type === "ROOK" && p.team === team
+    );
+    if (rook) {
+      rook.x = rookNewX;
     }
   }
-}
 
-// getValidMoves(piece: Piece, boardState: Piece[]) : Position[] {
-//   switch(piece.type)
-//   {
-//     case PieceType.PAWN:
-//       return getPossiblePawnMoves(piece, boardState);
-//     case PieceType.KNIGHT:
-//       return getPossibleKnightMoves(piece, boardState);
-//     case PieceType.BISHOP:
-//       return getPossibleBishopMoves(piece, boardState);
-//     case PieceType.ROOK:
-//       return getPossibleRookMoves(piece, boardState);
-//     case PieceType.QUEEN:
-//       return getPossibleQueenMoves(piece, boardState);
-//     case PieceType.KING:
-//       return getPossibleKingMoves(piece, boardState);
-//     default:
-//       return [];
-//   }
-// }
+
+  
+
+  getValidMoves(piece, boardState, checkKingSafety = true) {
+    let possibleMoves = [];
+    switch (piece.type) {
+      case "PAWN":
+        possibleMoves = getPossiblePawnMoves(piece, boardState);
+        break;
+      case "KNIGHT":
+        possibleMoves = getPossibleKnightMoves(piece, boardState);
+        break;
+      case "BISHOP":
+        possibleMoves = getPossibleBishopMoves(piece, boardState);
+        break;
+      case "ROOK":
+        possibleMoves = getPossibleRookMoves(piece, boardState);
+        break;
+      case "QUEEN":
+        possibleMoves = getPossibleQueenMoves(piece, boardState);
+        break;
+      case "KING":
+        possibleMoves = getPossibleKingMoves(piece, boardState);
+        break;
+    }
+
+    if (piece.type === "KING" && checkKingSafety) {
+      return possibleMoves.filter((move) => {
+        const hypotheticalBoard = boardState.map((p) =>
+          p.x === piece.x && p.y === piece.y ? { ...p, x: move.x, y: move.y } : p
+        );
+        return !this.isKingInDanger(piece.team, hypotheticalBoard);
+      });
+    }
+
+    return possibleMoves;
+  }
+
+  isKingInDanger(team, boardState) {
+    const king = boardState.find((p) => p.type === "KING" && p.team === team);
+    if (!king) return false;
+
+    for (const piece of boardState) {
+      if (piece.team !== team) {
+        const possibleMoves = this.getValidMoves(piece, boardState, false);
+        if (possibleMoves.some((move) => move.x === king.x && move.y === king.y)) {
+          console.log(`King of team ${team} is in danger!`);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+}

@@ -95,36 +95,7 @@ export default function ChessBoard() {
           pieces
         );
 
-        const isEnPassant = referee.isEnPassantMove(
-          grabPosition.x,
-          grabPosition.y,
-          x,
-          y,
-          currentPiece.type,
-          currentPiece.team,
-          pieces
-        );
-
-        const pawnDirection = currentPiece.team === TeamType.OUR ? 1 : -1;
-
-        if (isEnPassant) {
-          const updatedPieces = pieces.reduce((results, piece) => {
-            if (piece.x === grabPosition.x && piece.y === grabPosition.y) {
-              piece.enPassant = false;
-              piece.x = x;
-              piece.y = y;
-              results.push(piece);
-            } else if (!(piece.x === x && piece.y === y - pawnDirection)) {
-              if (piece.type === PieceType.PAWN) {
-                piece.enPassant = false;
-              }
-              results.push(piece);
-            }
-            return results;
-          }, []);
-
-          setPieces(updatedPieces);
-        } else if (validMove) {
+        if (validMove) {
           const updatedPieces = pieces.reduce((results, piece) => {
             if (piece.x === grabPosition.x && piece.y === grabPosition.y) {
               if (Math.abs(grabPosition.y - y) === 2 && piece.type === PieceType.PAWN) {
@@ -135,11 +106,34 @@ export default function ChessBoard() {
               piece.x = x;
               piece.y = y;
 
+              if (piece.type === PieceType.KING) {
+                piece.hasMoved = true;
+                // Handle castling by moving rook
+                if (Math.abs(grabPosition.x - x) === 2) {
+                  const rookX = x > grabPosition.x ? x - 1 : x + 1;
+                  const rook = pieces.find(
+                    (p) =>
+                      p.x === (x > grabPosition.x ? 7 : 0) &&
+                      p.y === y &&
+                      p.type === PieceType.ROOK &&
+                      p.team === piece.team
+                  );
+                  if (rook) {
+                    rook.x = rookX;
+                    rook.hasMoved = true;
+                  }
+                }
+              }
+              if (piece.type === PieceType.ROOK) {
+                piece.hasMoved = true;
+              }
+
               let promotionRow = piece.team === TeamType.OUR ? 7 : 0;
 
               if (piece.type === PieceType.PAWN && y === promotionRow) {
                 setPromotionPawn(piece);
               }
+
               results.push(piece);
             } else if (!(piece.x === x && piece.y === y)) {
               if (piece.type === PieceType.PAWN) {
