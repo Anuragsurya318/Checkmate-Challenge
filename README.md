@@ -1,27 +1,18 @@
-below is my Tile.jsx file code
+below is my App.jsx file code
 import React from "react";
+import ChessBoard from "./components/ChessBoard/ChessBoard";
 
-const Tile = ({ isWhite, image, highlight, onClick }) => {
+const App = () => {
 return (
-<div
-className={`tile w-[68.75px] h-[68.75px] ${
-        isWhite ? "bg-light_tile" : "bg-dark_tile"
-      } flex items-center justify-center bg-cover bg-center bg-no-repeat ${
-        highlight ? "border-4 border-yellow-500" : ""
-      }`}
-onClick={onClick} // Add onClick handler >
-{image && (
-<div
-style={{ backgroundImage: `url(${image})` }}
-className="chess-piece w-full h-full bg-cover" ></div>
-)}
+<div className="w-screen h-screen flex items-center justify-center bg-bg_color">
+<ChessBoard />
 </div>
 );
 };
 
-export default Tile;
+export default App;
 
-below is my Chessboard.jsx file code
+below is my ChessBoard.jsx file code
 import React, { useRef, useState, useEffect } from "react";
 import Tile from "../Tile/Tile";
 import Referee from "../../referee/Referee";
@@ -229,32 +220,32 @@ return (
         ref={modalRef}
         className="absolute top-0 bottom-0 left-0 right-0 z-50 flex items-center justify-center select-none hidden"
       >
-<div className="modal-body w-[550px] h-[225px] z-50 top-48 absolute bg-[rgba(0,0,0,0.4)] flex justify-center items-center">
+<div className="modal-body w-[90vw] h-[30vw] sm:w-[550px] sm:h-[225px] z-50 top-1/2 sm:top-48 transform sm:transform-none -translate-y-1/2 bg-[rgba(0,0,0,0.4)] flex justify-center items-center">
 {promotionPawn?.team === TeamType.OUR ? (
 <>
 <img
 src={wr}
 onClick={() => promotePawn(PieceType.ROOK)}
 alt="White Rook"
-className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+className="h-16 sm:h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
 />
 <img
 src={wb}
 onClick={() => promotePawn(PieceType.BISHOP)}
 alt="White Bishop"
-className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+className="h-16 sm:h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
 />
 <img
 src={wn}
 onClick={() => promotePawn(PieceType.KNIGHT)}
 alt="White Knight"
-className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+className="h-16 sm:h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
 />
 <img
 src={wq}
 onClick={() => promotePawn(PieceType.QUEEN)}
 alt="White Queen"
-className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
+className="h-16 sm:h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
 />
 </>
 ) : (
@@ -263,25 +254,25 @@ className="h-36 hover:bg-[rgba(255,255,255,0.2)] rounded-full cursor-pointer"
 src={br}
 onClick={() => promotePawn(PieceType.ROOK)}
 alt="Black Rook"
-className="h-36 hover:bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer"
+className="h-16 sm:h-36 hover:bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer"
 />
 <img
 src={bb}
 onClick={() => promotePawn(PieceType.BISHOP)}
 alt="Black Bishop"
-className="h-36 hover:bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer"
+className="h-16 sm:h-36 hover:bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer"
 />
 <img
 src={bn}
 onClick={() => promotePawn(PieceType.KNIGHT)}
 alt="Black Knight"
-className="h-36 hover:bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer"
+className="h-16 sm:h-36 hover:bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer"
 />
 <img
 src={bq}
 onClick={() => promotePawn(PieceType.QUEEN)}
 alt="Black Queen"
-className="h-36 hover:bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer"
+className="h-16 sm:h-36 hover:bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer"
 />
 </>
 )}
@@ -290,10 +281,12 @@ className="h-36 hover:bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer"
 <div
         id="chessboard"
         ref={chessboardRef}
-        className="w-[550px] h-[550px] flex flex-wrap relative transform"
+        className="w-full h-[90vw] sm:w-[550px] sm:h-[550px] flex flex-wrap relative transform"
       >
 {board}
 </div>
 </>
 );
 }
+
+i want you to add to button somewhere in the code for offer draw and resign the game, also write the logic for the same. and also alert both the players when the game is drawn or when the player resigns the game.

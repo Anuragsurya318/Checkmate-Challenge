@@ -11,7 +11,7 @@ import {
 } from "../../Constants";
 import { wb, wn, wq, wr, bb, bn, bq, br } from "../../assets/index.js";
 
-export default function ChessBoard() {
+export default function ChessBoard({ setGameStatus }) {
   const [activePiece, setActivePiece] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [promotionPawn, setPromotionPawn] = useState(null);
@@ -34,11 +34,11 @@ export default function ChessBoard() {
     const checkGameStatus = () => {
       if (referee.isCheckmate(currentTurn, pieces)) {
         setTimeout(() => {
-          alert(`${currentTurn === TeamType.OUR ? "Black" : "White"} won!`);
+          setGameStatus(`${currentTurn === TeamType.OUR ? "Black" : "White"} won by checkmate!`);
         }, 1000);
       } else if (referee.isStalemate(currentTurn, pieces)) {
         setTimeout(() => {
-          alert(`${currentTurn === TeamType.OUR ? "White" : "Black"} is in stalemate!`);
+          setGameStatus("The game is a stalemate!");
         }, 1000);
       }
     };
@@ -261,7 +261,7 @@ export default function ChessBoard() {
       <div
         id="chessboard"
         ref={chessboardRef}
-        className="w-full h-[90vw] sm:w-[550px] sm:h-[550px] flex flex-wrap relative transform"
+        className="w-full h-[90vw] sm:w-[550px] sm:h-[550px] flex flex-wrap relative transform mt-5 "
       >
         {board}
       </div>
