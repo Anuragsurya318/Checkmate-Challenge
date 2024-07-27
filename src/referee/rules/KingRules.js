@@ -1,9 +1,13 @@
+import { PieceType, TeamType } from "../../Constants";
 import {
   tileIsEmptyOrOccupiedByOpponent,
   tileIsOccupied,
   tileIsOccupiedByOpponent,
 } from "./GeneralRules";
+import { getValidMovesForPiece } from "./getValidMovesForPiece";
+// import { getValidMovesForPiece } from "./MoveValidation"; // Ensure this import is correct
 
+// Determine if the king's move is valid
 export const kingMove = (px, py, x, y, team, boardState) => {
   const dx = Math.abs(px - x);
   const dy = Math.abs(py - y);
@@ -15,9 +19,9 @@ export const kingMove = (px, py, x, y, team, boardState) => {
 
   // Castling move
   if (dy === 0 && dx === 2) {
-    const rookX = x > px ? 7 : 0; // Rook position depending on king side or queen side castling
+    const rookX = x > px ? 7 : 0; // Determine rook position based on castling direction
     const rook = boardState.find(
-      (p) => p.x === rookX && p.y === py && p.type === "ROOK" && p.team === team
+      (p) => p.x === rookX && p.y === py && p.type === PieceType.ROOK && p.team === team
     );
 
     if (!rook || rook.hasMoved || hasKingMoved(boardState, team)) {
@@ -41,13 +45,14 @@ export const kingMove = (px, py, x, y, team, boardState) => {
   return false;
 };
 
+// Check if the king is in danger
 const isKingInDanger = (team, boardState) => {
-  const king = boardState.find((p) => p.type === "KING" && p.team === team);
+  const king = boardState.find((p) => p.type === PieceType.KING && p.team === team);
 
   if (!king) return false;
 
   // Get all opponent pieces
-  const opponentTeam = team === "WHITE" ? "BLACK" : "WHITE";
+  const opponentTeam = team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
   const opponentPieces = boardState.filter((p) => p.team === opponentTeam);
 
   // Check if any opponent piece can move to the king's position
@@ -57,19 +62,22 @@ const isKingInDanger = (team, boardState) => {
   });
 };
 
+// Check if the king has moved
 const hasKingMoved = (boardState, team) => {
-  const king = boardState.find((p) => p.type === "KING" && p.team === team);
-  return king.hasMoved;
+  const king = boardState.find((p) => p.type === PieceType.KING && p.team === team);
+  return king && king.hasMoved;
 };
 
+// Check if the king would be in check after castling
 const isKingInCheckAfterCastling = (px, py, x, y, team, boardState) => {
   const hypotheticalBoard = boardState.map((p) =>
-    p.type === "KING" && p.team === team ? { ...p, x, y } : p
+    p.type === PieceType.KING && p.team === team ? { ...p, x, y } : p
   );
 
   return isKingInDanger(team, hypotheticalBoard);
 };
 
+// Get possible moves for the king
 export const getPossibleKingMoves = (king, boardState) => {
   const possibleMoves = [];
 
@@ -86,6 +94,8 @@ export const getPossibleKingMoves = (king, boardState) => {
 
   directions.forEach((dir) => {
     const destination = { x: king.x + dir.x, y: king.y + dir.y };
+    if (destination.x < 0 || destination.x > 7 || destination.y < 0 || destination.y > 7) return;
+
     if (tileIsEmptyOrOccupiedByOpponent(destination.x, destination.y, boardState, king.team)) {
       possibleMoves.push(destination);
     }

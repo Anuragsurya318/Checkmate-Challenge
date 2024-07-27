@@ -19,6 +19,15 @@ export const TeamType = {
   OUR: "OUR",
 };
 
+// MessageTypes.js or within ChessBoard.jsx
+export const MESSAGES = {
+  CHECKMATE: "Checkmate! Game over.",
+  STALEMATE: "Stalemate! The game is a draw.",
+  CHECK: "Your king is in check!",
+  MOVE: "Move successful.",
+  INVALID_MOVE: "Invalid move. Please try again.",
+};
+
 export const initialBoardState = [
   {
     image: br,

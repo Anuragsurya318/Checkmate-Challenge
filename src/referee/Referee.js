@@ -74,9 +74,6 @@ export default class Referee {
     }
   }
 
-
-  
-
   getValidMoves(piece, boardState, checkKingSafety = true) {
     let possibleMoves = [];
     switch (piece.type) {
@@ -126,5 +123,24 @@ export default class Referee {
       }
     }
     return false;
+  }
+
+  isCheckmate(team, boardState) {
+    const king = boardState.find((p) => p.type === "KING" && p.team === team);
+    if (!king) return false;
+
+    const validMoves = this.getValidMoves(king, boardState);
+    if (validMoves.length > 0) return false; // If there are valid moves, not checkmate
+
+    return this.isKingInDanger(team, boardState); // Check if the king is still in danger
+  }
+
+  isStalemate(team, boardState) {
+    const pieces = boardState.filter((p) => p.team === team);
+    const hasLegalMove = pieces.some((piece) => {
+      const validMoves = this.getValidMoves(piece, boardState);
+      return validMoves.length > 0;
+    });
+    return !hasLegalMove && !this.isKingInDanger(team, boardState);
   }
 }
